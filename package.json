@@ -1,7 +1,12 @@
 {
   "name": "react_firebase_authentication",
   "version": "0.1.0",
-  "private": true,
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
   "dependencies": {
     "firebase": "^5.8.2",
     "react": "^16.8.1",
@@ -11,12 +16,7 @@
     "react-scripts": "2.1.5",
     "recompose": "^0.30.0"
   },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
+  "private": true,
   "eslintConfig": {
     "extends": "react-app"
   },
