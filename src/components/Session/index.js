@@ -1,5 +1,7 @@
-import authUserContext, { withAuthentication, withAuthorization } from './Context';
-
-export default authUserContext;
-export { withAuthentication, withAuthorization };
-
+import {
+  AuthUserContext,
+  withAuthentication,
+  withAuthorization
+} from "./Context";
+import withEmailVerification from "./withEmailVerification";
+export { withEmailVerification, AuthUserContext, withAuthentication, withAuthorization };

@@ -1,109 +1,145 @@
-import React, { Component } from 'react';
-import { Link, withRouter } from 'react-router-dom';
-import { compose } from 'recompose';
-import { withFirebase } from '../Firebase';
-import * as ROUTES from '../../constants/routes';
-import * as ROLES from '../../constants/roles';
+import React, { Component } from "react";
+import { Link, withRouter } from "react-router-dom";
+import { compose } from "recompose";
+import { withFirebase } from "../Firebase";
+import * as ROUTES from "../../constants/routes";
+import * as ROLES from "../../constants/roles";
 
 const SignUpPage = () => (
-	<div>
-		<h1>SignUp</h1>
-		<SignUpForm />
-	</div>
+  <div>
+    <h1>SignUp</h1>
+    <SignUpForm />
+  </div>
 );
 
 const INITIAL_STATE = {
-	username: '',
-	email: '',
-	passwordOne: '',
-	passwordTwo: '',
-	isAdmin: false,
-	error: null
+  username: "",
+  email: "",
+  passwordOne: "",
+  passwordTwo: "",
+  isAdmin: false,
+  error: null
 };
 class SignUpFormBase extends Component {
-	constructor(props) {
-		super(props);
-		this.state = { ...INITIAL_STATE };
-	}
+  constructor(props) {
+    super(props);
+    this.state = { ...INITIAL_STATE };
+  }
 
-	onSubmit = (event) => {
-		const { username, email, passwordOne, isAdmin } = this.state;
-		const roles = [];
+  onSubmit = event => {
+    const { username, email, passwordOne, isAdmin } = this.state;
+    const roles = [];
 
-		if (isAdmin) {
-			roles.push(ROLES.ADMIN);
-		}
+    if (isAdmin) {
+      roles.push(ROLES.ADMIN);
+    }
 
-		this.props.firebase
-			.doCreateUserWithEmailAndPassword(email, passwordOne)
-			.then((authUser) => {
-				return this.props.firebase.user(authUser.user.uid).set({
-					username,
-					email,
-					roles
-				});
-			})
-			.then((authUser) => {
-				this.setState({ ...INITIAL_STATE });
-				this.props.history.push(ROUTES.HOME);
-			})
-			.catch((error) => {
-				console.log('ERROR: ', error);
-				this.setState({ error });
-			});
+    this.props.firebase
+      .doCreateUserWithEmailAndPassword(email, passwordOne)
+      .then(authUser => {
+        return this.props.firebase.user(authUser.user.uid).set({
+          username,
+          email,
+          roles
+        });
+      })
+      .then(() => {
+        return this.props.firebase.doSendEmailVerification();
+      })
+      .then(authUser => {
+        this.setState({ ...INITIAL_STATE });
+        this.props.history.push(ROUTES.HOME);
+      })
+      .catch(error => {
+        console.log("ERROR: ", error);
+        this.setState({ error });
+      });
 
-		event.preventDefault();
-	};
+    event.preventDefault();
+  };
 
-	onChange = (event) => this.setState({ [event.target.name]: event.target.value });
-	onChangeCheckbox = (event) => this.setState({ [event.target.name]: event.target.checked });
+  onChange = event =>
+    this.setState({ [event.target.name]: event.target.value });
+  onChangeCheckbox = event =>
+    this.setState({ [event.target.name]: event.target.checked });
 
-	render() {
-		const { username, email, passwordOne, passwordTwo, isAdmin, error } = this.state;
-		const isInvalid = passwordOne !== passwordTwo || passwordOne === '' || email === '' || username === '';
+  render() {
+    const {
+      username,
+      email,
+      passwordOne,
+      passwordTwo,
+      isAdmin,
+      error
+    } = this.state;
+    const isInvalid =
+      passwordOne !== passwordTwo ||
+      passwordOne === "" ||
+      email === "" ||
+      username === "";
 
-		return (
-			<form onSubmit={this.onSubmit}>
-				<input name="username" value={username} onChange={this.onChange} type="text" placeholder="Full Name" />
-				<br />
-				<input name="email" value={email} onChange={this.onChange} type="text" placeholder="Email Address" />
-				<br />
-				<input
-					name="passwordOne"
-					value={passwordOne}
-					onChange={this.onChange}
-					type="password"
-					placeholder="Password"
-				/>
-				<br />
-				<input
-					name="passwordTwo"
-					value={passwordTwo}
-					onChange={this.onChange}
-					type="password"
-					placeholder="Confirm Password"
-				/>
-				<br />
-				<label>
-					Admin:
-					<input name="isAdmin" type="checkbox" checked={isAdmin} onChange={this.onChangeCheckbox} />
-				</label>
-				<button type="submit" disable={isInvalid.toString()}>
-					Sign Up
-				</button>
+    return (
+      <form onSubmit={this.onSubmit}>
+        <input
+          name="username"
+          value={username}
+          onChange={this.onChange}
+          type="text"
+          placeholder="Full Name"
+        />
+        <br />
+        <input
+          name="email"
+          value={email}
+          onChange={this.onChange}
+          type="text"
+          placeholder="Email Address"
+        />
+        <br />
+        <input
+          name="passwordOne"
+          value={passwordOne}
+          onChange={this.onChange}
+          type="password"
+          placeholder="Password"
+        />
+        <br />
+        <input
+          name="passwordTwo"
+          value={passwordTwo}
+          onChange={this.onChange}
+          type="password"
+          placeholder="Confirm Password"
+        />
+        <br />
+        <label>
+          Admin:
+          <input
+            name="isAdmin"
+            type="checkbox"
+            checked={isAdmin}
+            onChange={this.onChangeCheckbox}
+          />
+        </label>
+        <button type="submit" disable={isInvalid.toString()}>
+          Sign Up
+        </button>
 
-				{error && <p>{error.message}</p>}
-			</form>
-		);
-	}
+        {error && <p>{error.message}</p>}
+      </form>
+    );
+  }
 }
 
 /* const SignUpForm = withRouter(withFirebase(SignUpFormBase)); */
-const SignUpForm = compose(withRouter, withFirebase)(SignUpFormBase);
+const SignUpForm = compose(
+  withRouter,
+  withFirebase
+)(SignUpFormBase);
 const SignUpLink = () => (
-	<p>
-		Don't have an account? <Link to={ROUTES.SIGN_UP}>Sign Up</Link>
-	</p>
+  <p>
+    Don't have an account? <Link to={ROUTES.SIGN_UP}>Sign Up</Link>
+  </p>
 );
 
 export default SignUpPage;
