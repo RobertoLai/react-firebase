@@ -1,83 +1,36 @@
 import React, { Component } from "react";
+import { Switch, Route, Link } from "react-router-dom";
 import * as ROLES from "../../constants/roles";
+import * as ROUTES from "../../constants/routes";
 import { compose } from "recompose";
 import { withFirebase } from "../Firebase";
 import { withAuthorization, withEmailVerification } from "../Session";
-class AdminPage extends Component {
-  constructor(props) {
-    super(props);
+import { UsersListBase, UserItemBase } from "../Users";
 
-    this.state = {
-      loading: false,
-      users: []
-    };
-  }
+// const UserItemBase = ({ match }) => (
+//   <div>
+//     <h2>User ({match.params.id})</h2>
+//   </div>
+// );
 
-  componentDidMount() {
-    this.setState({ loading: true });
-    console.log(`componentDidMount AdminPage`);
-    this.props.firebase.users().on("value", snapshot => {
-      console.log(`this.props.firebase.users().on("value")`);
+const condition = authUser => authUser && authUser.roles.includes(ROLES.ADMIN);
+const UserList = withFirebase(UsersListBase);
+const UserItem = withFirebase(UserItemBase);
 
-      const usersObject = snapshot.val();
+const AdminPage = () => (
+  <div>
+    <h1>Admin</h1>
+    <p>The Admin Page is accessible by every signed in admin user.</p>
 
-      const usersList = Object.keys(usersObject).map(key => ({
-        ...usersObject[key],
-        uid: key
-      }));
-
-      this.setState({
-        users: usersList,
-        loading: false
-      });
-    });
-  }
-
-  componentWillUnmount() {
-    this.props.firebase.users().off();
-  }
-
-  render() {
-    const { users, loading } = this.state;
-
-    return (
-      <div>
-        <h1>Admin</h1>
-        <p>The Admin Page is accessible by every signed in admin user.</p>
-
-        {loading && <div>Loading ...</div>}
-
-        <UserList users={users} />
-      </div>
-    );
-  }
-}
-
-const condition = authUser =>
-  !!authUser && authUser.roles.includes(ROLES.ADMIN);
-
-//export default withAuthorization(condition)(AdminPage);
+    <Switch>
+      <Route exact path={ROUTES.ADMIN_DETAILS} component={UserItem} />
+      <Route exact path={ROUTES.ADMIN} component={UserList} />
+    </Switch>
+  </div>
+);
 
 export default compose(
   withEmailVerification,
   withAuthorization(condition),
   withFirebase
 )(AdminPage);
-
-const UserList = ({ users }) => (
-  <ul>
-    {users.map(user => (
-      <li key={user.uid}>
-        <span>
-          <strong>ID:</strong> {user.uid}
-        </span>
-        <span>
-          <strong>E-Mail:</strong> {user.email}
-        </span>
-        <span>
-          <strong>Username:</strong> {user.username}
-        </span>
-      </li>
-    ))}
-  </ul>
-);

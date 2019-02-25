@@ -1,3 +1,4 @@
 import UsersListBase from './UsersListBase';
+import UserItemBase from './UserItemBase';
 
-export default UsersListBase;
+export {UserItemBase, UsersListBase};
