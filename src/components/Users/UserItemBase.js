@@ -10,34 +10,32 @@ class UserItemBase extends Component {
     super(props);
 
     this.state = {
-      loading: false,
-      user: null,
-      ...props.location.state
+      loading: false
     };
   }
 
   componentDidMount() {
-    if (this.state.user) {
+    /*  if (this.state.user) {
       return;
-    }
+    } */
 
-    this.setState({ loading: true });
+    if (!this.props.user) {
+      this.setState({ loading: true });
+    }
 
     this.props.firebase
       .user(this.props.match.params.id)
       .on("value", snapshot => {
-        this.setState({
-          user: snapshot.val(),
-          loading: false
-        });
+        this.props.onSetUser(snapshot.val(), this.props.match.params.id);
       });
   }
   onSendPasswordResetEmail = () => {
-    this.props.firebase.doPasswordReset(this.state.user.email);
+    this.props.firebase.doPasswordReset(this.props.user.email);
   };
 
   render() {
-    const { user, loading } = this.state;
+    const { user } = this.props;
+    const { loading } = this.state;
 
     return (
       <div>
@@ -62,5 +60,19 @@ class UserItemBase extends Component {
   }
 }
 
-const UserItem = withFirebase(UserItemBase);
+const mapStateToProps = (state, props) => ({
+  user: (state.userState.users || {})[props.match.params.id]
+});
+
+const mapDispatchToProps = dispatch => ({
+  onSetUser: (user, uid) => dispatch({ type: "USER_SET", user, uid })
+});
+
+const UserItem = compose(
+  withFirebase,
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )
+)(UserItemBase);
 export { UserItemBase, UserItem };
