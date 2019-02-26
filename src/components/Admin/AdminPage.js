@@ -5,17 +5,11 @@ import * as ROUTES from "../../constants/routes";
 import { compose } from "recompose";
 import { withFirebase } from "../Firebase";
 import { withAuthorization, withEmailVerification } from "../Session";
-import { UsersListBase, UserItemBase } from "../Users";
+import { UserItem, UsersList } from "../Users";
 
-// const UserItemBase = ({ match }) => (
-//   <div>
-//     <h2>User ({match.params.id})</h2>
-//   </div>
-// );
 
 const condition = authUser => authUser && authUser.roles.includes(ROLES.ADMIN);
-const UserList = withFirebase(UsersListBase);
-const UserItem = withFirebase(UserItemBase);
+
 
 const AdminPage = () => (
   <div>
@@ -24,7 +18,7 @@ const AdminPage = () => (
 
     <Switch>
       <Route exact path={ROUTES.ADMIN_DETAILS} component={UserItem} />
-      <Route exact path={ROUTES.ADMIN} component={UserList} />
+      <Route exact path={ROUTES.ADMIN} component={UsersList} />
     </Switch>
   </div>
 );

@@ -5,6 +5,8 @@ import * as ROLES from "../../constants/roles";
 import SignOutButton from "../SignOut";
 import { AuthUserContext } from "../Session/Context";
 
+import { connect } from "react-redux";
+
 const NavigationAuth = ({ authUser }) => (
   <div>
     <h2>Navigation</h2>
@@ -44,18 +46,10 @@ const NavigationNonAuth = () => (
   </div>
 );
 
-const Navigation = () => (
-  <div>
-    <AuthUserContext.Consumer>
-      {authUser =>
-        authUser ? (
-          <NavigationAuth authUser={authUser} />
-        ) : (
-          <NavigationNonAuth />
-        )
-      }
-    </AuthUserContext.Consumer>
-  </div>
-);
+const Navigation = ({ authUser }) =>
+  authUser ? <NavigationAuth authUser={authUser} /> : <NavigationNonAuth />;
 
-export default Navigation;
+const mapStateToProps = state => ({
+  authUser: state.sessionState.authUser
+});
+export default connect(mapStateToProps)(Navigation);

@@ -9,20 +9,23 @@ import {
   withEmailVerification
 } from "../Session";
 
-const AccountPage = () => (
-  <AuthUserContext.Consumer>
-    {authUser => (
-      <div>
-        <h1>Account: {authUser.email}</h1>
-        <PasswordForgetForm />
-        <PasswordChangeForm />
-      </div>
-    )}
-  </AuthUserContext.Consumer>
+import { connect } from "react-redux";
+
+const AccountPage = ({ authUser }) => (
+  <div>
+    <h1>Account: {authUser.email}</h1>
+    <PasswordForgetForm />
+    <PasswordChangeForm />
+  </div>
 );
+
+const mapStateToProps = state => ({
+  authUser: state.sessionState.authUser
+});
 
 const condition = authUser => !!authUser;
 export default compose(
+  connect(mapStateToProps),
   withEmailVerification,
   withAuthorization(condition)
 )(AccountPage);

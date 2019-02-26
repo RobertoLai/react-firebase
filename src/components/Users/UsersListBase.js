@@ -1,6 +1,9 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import * as ROUTES from "../../constants/routes";
+import { connect } from "react-redux";
+import { compose } from "recompose";
+import { withFirebase } from "../Firebase";
 
 class UsersListBase extends Component {
   constructor(props) {
@@ -73,4 +76,6 @@ class UsersListBase extends Component {
   }
 }
 
-export default UsersListBase;
+const UsersList = withFirebase(UsersListBase);
+
+export { UsersList, UsersListBase };

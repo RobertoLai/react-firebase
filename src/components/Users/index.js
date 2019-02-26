@@ -1,4 +1,4 @@
-import UsersListBase from './UsersListBase';
-import UserItemBase from './UserItemBase';
+import { UsersListBase, UsersList } from "./UsersListBase";
+import { UserItemBase, UserItem } from "./UserItemBase";
 
-export {UserItemBase, UsersListBase};
+export { UserItemBase, UserItem, UsersListBase, UsersList };
